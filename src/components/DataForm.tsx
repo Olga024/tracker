@@ -1,0 +1,48 @@
+import { Box, Button, TextField } from "@mui/material";
+import type { TDataRecord } from "../App";
+import { useState } from "react";
+import DateInput from "./DateInput";
+
+export type TDataFormProps = {
+    dataSetter: (data: TDataRecord) => void;
+};
+
+export const DataForm = ({ dataSetter }: TDataFormProps) => {
+    const [date, setDate] = useState('');
+    const [range, setRange] = useState(0);
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (date && range > 0) {
+            dataSetter({
+                date,
+                range,
+                id: 0
+            });
+            setDate('');
+            setRange(0);
+        }
+    };
+
+    return (
+        <Box
+            sx={{
+                display: 'flex',
+                flexDirection: 'row',
+            }}
+        >
+            <DateInput onChange={setDate} />
+            <TextField
+                id="outlined-basic"
+                label="Пройдено км"
+                variant="outlined"
+                value={range}
+                onChange={(e) => setRange(parseFloat(e.target.value))}
+                InputProps={{
+                    inputProps: { min: 0, step: 0.1 },
+                }}
+            />
+            <Button variant="outlined" onClick={handleSubmit}>OK</Button>
+        </Box>
+    );
+};

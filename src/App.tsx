@@ -1,33 +1,49 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
+import { DataForm } from './components/DataForm'
+import { Result } from './components/Result'
+
+export type TDataRecord = {
+  id: number;
+  date: string;
+  range: number;
+}
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [tableData, setTableData] = useState<TDataRecord[]>([]);
+
+  const dataFormHandler = (data: TDataRecord) => {
+
+    const { date, range } = data;
+    const existingRecordIndex = tableData.findIndex(record => record.date === date);
+
+    if (existingRecordIndex !== -1) {
+
+      const updatedTableData = [...tableData];
+      updatedTableData[existingRecordIndex].range += range;
+      setTableData(updatedTableData);
+    } else {
+
+      const newData = {
+        id: Date.now(),
+        date,
+        range,
+      };
+      const updatedTableData = [...tableData, newData];
+      updatedTableData.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      setTableData(updatedTableData);
+    }
+  };
+
+  const handleDelete = (id: number) => {
+    const updatedTableData = tableData.filter(record => record.id !== id);
+    setTableData(updatedTableData);
+  };
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <DataForm dataSetter={dataFormHandler} />
+      <Result data={tableData} onDelete={handleDelete} />
     </>
   )
 }
