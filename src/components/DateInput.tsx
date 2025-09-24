@@ -1,19 +1,21 @@
 import * as React from 'react';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
+import {LocalizationProvider} from '@mui/x-date-pickers/LocalizationProvider';
+import {DatePicker} from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
 
-export default function DateInput({ onChange }: { onChange: (date: string) => void }) {
-    const [value, setValue] = React.useState(dayjs());
+export type TDateInputProps = {
+    onChange: (date: dayjs.Dayjs) => void;
+    value: dayjs.Dayjs;
+}
 
-    const handleChange = (newValue: dayjs.Dayjs | null) => {
+export default function DateInput({onChange, value}: TDateInputProps) {
+
+    const handleChange = React.useCallback((newValue: dayjs.Dayjs | null) => {
         if (newValue) {
-            const formattedDate = newValue.format('DD.MM.YYYY');
-            onChange(formattedDate);
-            setValue(newValue)
+            onChange(newValue);
         }
-    };
+    }, [onChange]);
 
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>

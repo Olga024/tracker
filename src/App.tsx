@@ -1,42 +1,39 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import './App.css'
 import { DataForm } from './components/DataForm'
 import { Result } from './components/Result'
+import dayjs from 'dayjs'
 
 export type TDataRecord = {
-  id: number;
-  date: string;
+  date: dayjs.Dayjs;
   range: number;
 }
 
 function App() {
   const [tableData, setTableData] = useState<TDataRecord[]>([]);
 
-  const dataFormHandler = (data: TDataRecord) => {
-
+  const dataFormHandler = useCallback((data: TDataRecord) => {
     const { date, range } = data;
-    const existingRecordIndex = tableData.findIndex(record => record.date === date);
+    const existingRecordIndex = tableData.findIndex(record => record.date.isSame(date, 'date'));
 
-    if (existingRecordIndex !== -1) {
-
+    if (existingRecordIndex > -1) {
       const updatedTableData = [...tableData];
       updatedTableData[existingRecordIndex].range += range;
       setTableData(updatedTableData);
     } else {
-
       const newData = {
         id: Date.now(),
         date,
         range,
       };
       const updatedTableData = [...tableData, newData];
-      updatedTableData.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      updatedTableData.sort((a, b) => b.date.diff(a.date));
       setTableData(updatedTableData);
     }
-  };
+  }, [tableData, setTableData]);
 
-  const handleDelete = (id: number) => {
-    const updatedTableData = tableData.filter(record => record.id !== id);
+  const handleDelete = (date: dayjs.Dayjs) => {
+    const updatedTableData = tableData.filter(record => !record.date.isSame(date, 'date'));
     setTableData(updatedTableData);
   };
 
